@@ -7,10 +7,10 @@ function age -d "Just to get next version tag on git"
   if [ "$argv[1]" != "" ]
     set latest_version $argv[1]
   else
-    set -l tags (git tag --sort=-taggerdate | xargs -n 1000)
+    set -l tags (git tag --sort=-creatordate | xargs -n 1000)
     set latest_version "v0.0.0"
     for tag in (string split ' ' $tags)
-      set -l matches (string match -r 'v\d+\.\d+\.\d+' $tag)
+      set -l matches (string match -r 'v?\d+\.\d+\.\d+' $tag)
       if test $matches
         set latest_version $tag
         break
@@ -24,16 +24,16 @@ function age -d "Just to get next version tag on git"
   set -l patch $matches[4]
 
   if set -lq _flag_patch _flag_p
-    echo v{$major}.{$minor}.(math $patch + 1)
+    echo {$major}.{$minor}.(math $patch + 1)
     return
   else if set -lq _flag_minor _flag_m
-    echo v{$major}.(math $minor + 1).0
+    echo {$major}.(math $minor + 1).0
     return
   else if set -lq _flag_major _flag_M
-    echo v(math $major + 1).0.0
+    echo (math $major + 1).0.0
     return
   else
-    echo 'Specify one of major|minor|patch as option'
-    return 1
+    echo {$major}.{$minor}.{$patch}
+    return
   end
 end
